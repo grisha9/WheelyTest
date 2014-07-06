@@ -1,6 +1,8 @@
 package ru.rzn.gmyasoedov.wheelytest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -40,6 +42,14 @@ public class WheelyMapFragment extends Fragment {
         setHasOptionsMenu(true);
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
+        // check location provider
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_ERROR,
+                    getResources().getString(R.string.location_error),
+                    getActivity());
+        }
     }
 
     @Override
@@ -135,6 +145,9 @@ public class WheelyMapFragment extends Fragment {
             case R.id.disconnect:
                 BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_DISCONNECT, null, getActivity());
                 getActivity().stopService(new Intent(getActivity(), WheelyService.class));
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

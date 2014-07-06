@@ -9,7 +9,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 import de.tavendo.autobahn.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,6 +98,8 @@ public class WheelyService extends Service {
             BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_OPEN, null, WheelyService.this);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                     MIN_TIME, MIN_DISTANCE, localLocationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    MIN_TIME, MIN_DISTANCE, localLocationListener);
         }
 
         @Override
@@ -136,14 +137,7 @@ public class WheelyService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            JSONObject object = new JSONObject();
-            try {
-                object.put(JSON_LAT, location.getLatitude());
-                object.put(JSON_LON, location.getLongitude());
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-            }
-            connection.sendTextMessage(object.toString());
+            sendLocation(location);
         }
 
         @Override
@@ -153,13 +147,25 @@ public class WheelyService extends Service {
 
         @Override
         public void onProviderEnabled(String provider) {
-
+            Location location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                sendLocation(location);
+            }
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.location_error),
-                    Toast.LENGTH_LONG).show();
+        }
+
+        private void sendLocation(Location location) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put(JSON_LAT, location.getLatitude());
+                object.put(JSON_LON, location.getLongitude());
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
+            }
+            connection.sendTextMessage(object.toString());
         }
     }
 

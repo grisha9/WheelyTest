@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:wtest="http://schemas.android.com/apk/res-auto">
-<item android:id="@+id/disconnect"
-      android:title="@string/menu_disconnect"
-      wtest:showAsAction="always"  />
+    <item android:id="@+id/settings"
+          android:title="@string/menu_settings"
+          wtest:showAsAction="always"/>
+    <item android:id="@+id/disconnect"
+          android:title="@string/menu_disconnect"
+          wtest:showAsAction="always"/>
 
 </menu>
