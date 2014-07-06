@@ -1,9 +1,12 @@
 package ru.rzn.gmyasoedov.wheelytest;
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
@@ -34,29 +37,13 @@ public class WheelyTestActivity extends ActionBarActivity {
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (fragment == null) {
+        if (fragment == null && isServiceRunning(WheelyService.class)) {
+            fragment = new WheelyMapFragment();
+            fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, TAG_FRAGMENT).commit();
+        } else {
             fragment = new LoginFragment();
             fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, TAG_FRAGMENT).commit();
         }
-
-        ServiceConnection serviceConnection = new ServiceConnection() {
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                WheelyService myService = ((WheelyService.WheelyBinder) binder).getService();
-                if (myService.isConnected() && !(fragment instanceof WheelyMapFragment)) {
-                    Log.e(TAG, "BIND");
-                    fragment = new WheelyMapFragment();
-                    fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment,
-                            TAG_FRAGMENT).commit();
-                }
-                unbindService(this);
-            }
-
-            public void onServiceDisconnected(ComponentName name) {
-                Log.d(TAG, "MainActivity onServiceDisconnected");
-            }
-        };
-        Intent intent = new Intent(this, WheelyService.class);
-        bindService(intent, serviceConnection, 0);
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -123,5 +110,15 @@ public class WheelyTestActivity extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+    }
+
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

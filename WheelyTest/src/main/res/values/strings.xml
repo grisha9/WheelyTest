@@ -6,5 +6,5 @@
     <string name="menu_connect">connect</string>
     <string name="menu_disconnect">disconnect</string>
     <string name="map_error">error render map</string>
-
+    <string name="location_error">getting location error</string>
 </resources>

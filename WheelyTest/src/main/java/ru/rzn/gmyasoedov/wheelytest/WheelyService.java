@@ -9,6 +9,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 import de.tavendo.autobahn.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -94,8 +95,6 @@ public class WheelyService extends Service {
             BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_OPEN, null, WheelyService.this);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                     MIN_TIME, MIN_DISTANCE, localLocationListener);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    MIN_TIME, MIN_DISTANCE, localLocationListener);
         }
 
         @Override
@@ -105,6 +104,7 @@ public class WheelyService extends Service {
 
         @Override
         public void onClose(int code, Bundle reason) {
+            locationManager.removeUpdates(localLocationListener);
             if (ERROR_403 == reason.getInt(WebSocketConnection.EXTRA_STATUS_CODE)) {
                 BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_ERROR,
                         getResources().getString(R.string.connect_error), WheelyService.this);
@@ -154,7 +154,8 @@ public class WheelyService extends Service {
 
         @Override
         public void onProviderDisabled(String provider) {
-
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.location_error),
+                    Toast.LENGTH_LONG).show();
         }
     }
 
