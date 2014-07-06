@@ -40,7 +40,7 @@ public class WheelyTestActivity extends ActionBarActivity {
         if (fragment == null && isServiceRunning(WheelyService.class)) {
             fragment = new WheelyMapFragment();
             fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, TAG_FRAGMENT).commit();
-        } else {
+        } else if (fragment == null) {
             fragment = new LoginFragment();
             fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, TAG_FRAGMENT).commit();
         }

@@ -46,10 +46,14 @@ public class WheelyService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        name = intent.getStringExtra(LoginFragment.NAME);
-        password = intent.getStringExtra(LoginFragment.PASSWORD);
-        new WheelyWebSocketConnectionHandler();
-        Log.e(TAG, "START");
+        Log.e(TAG, "startId " + startId);
+        //only first call run connection
+        if (startId == 1) {
+            name = intent.getStringExtra(LoginFragment.NAME);
+            password = intent.getStringExtra(LoginFragment.PASSWORD);
+            new WheelyWebSocketConnectionHandler();
+            Log.e(TAG, "START");
+        }
         return START_REDELIVER_INTENT;
     }
 
@@ -107,7 +111,7 @@ public class WheelyService extends Service {
             locationManager.removeUpdates(localLocationListener);
             if (ERROR_403 == reason.getInt(WebSocketConnection.EXTRA_STATUS_CODE)) {
                 BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_ERROR,
-                        getResources().getString(R.string.connect_error), WheelyService.this);
+                        getResources().getString(R.string.access_error), WheelyService.this);
                 stopSelf();
             } else {
                 startConnect();

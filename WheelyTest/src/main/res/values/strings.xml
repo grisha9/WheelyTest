@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WheelyTest</string>
-    <string name="connect_error">Connect error</string>
     <string name="connecting">Connecting...</string>
     <string name="menu_connect">connect</string>
     <string name="menu_disconnect">disconnect</string>
     <string name="map_error">error render map</string>
     <string name="location_error">getting location error</string>
+    <string name="connect_error">No internet</string>
+    <string name="access_error">Invalid user name or password</string>
 </resources>

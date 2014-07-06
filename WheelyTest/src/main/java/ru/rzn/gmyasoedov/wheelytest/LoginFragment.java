@@ -2,6 +2,8 @@ package ru.rzn.gmyasoedov.wheelytest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -80,20 +82,31 @@ public class LoginFragment extends Fragment {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.connect:
-                //hide key board
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
-                Intent connectIntent = new Intent(getActivity(), WheelyService.class);
-                connectIntent.putExtra(NAME, name);
-                connectIntent.putExtra(PASSWORD, password);
+                if (isOnline()) {
+                    //hide key board
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+                    Intent connectIntent = new Intent(getActivity(), WheelyService.class);
+                    connectIntent.putExtra(NAME, name);
+                    connectIntent.putExtra(PASSWORD, password);
 
-                BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_START, null, getActivity());
-                getActivity().startService(connectIntent);
+                    BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_START, null, getActivity());
+                    getActivity().startService(connectIntent);
+                } else {
+                    BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_ERROR,
+                            getResources().getString(R.string.connect_error), getActivity());
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 }
