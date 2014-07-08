@@ -6,11 +6,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Login fragment
@@ -18,9 +19,8 @@ import android.widget.EditText;
 public class LoginFragment extends Fragment {
     public static final String PASSWORD = "password";
     public static final String NAME = "name";
-
-    private String name;
-    private String password;
+    private EditText name;
+    private EditText password;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,42 +34,8 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.layout_login, container, false);
-        EditText nameEditText = ((EditText) view.findViewById(R.id.name));
-        nameEditText.setText(name);
-        nameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                name = charSequence.toString();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-        EditText passwordEditText = ((EditText) view.findViewById(R.id.password));
-        passwordEditText.setText(password);
-        passwordEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                password = charSequence.toString();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
+        name = (EditText) view.findViewById(R.id.name);
+        password = ((EditText) view.findViewById(R.id.password));
         return view;
     }
 
@@ -88,9 +54,13 @@ public class LoginFragment extends Fragment {
                             Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
                     Intent connectIntent = new Intent(getActivity(), WheelyService.class);
-                    connectIntent.putExtra(NAME, name);
-                    connectIntent.putExtra(PASSWORD, password);
-
+                    connectIntent.putExtra(NAME, name.getText().toString());
+                    connectIntent.putExtra(PASSWORD, password.getText().toString());
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(3000);
+                    } catch (InterruptedException e) {
+                        Log.e("e", e.getMessage());
+                    }
                     BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_START, null, getActivity());
                     getActivity().startService(connectIntent);
                 } else {

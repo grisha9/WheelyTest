@@ -84,11 +84,25 @@ public class WheelyTestActivity extends ActionBarActivity {
                 }
             }
         };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         IntentFilter intentFilter = new IntentFilter(BroadcastUtils.WHEELY_BROADCAST_ACTION);
         registerReceiver(receiver, intentFilter);
-
-
+        if (isServiceRunning(WheelyService.class) && !(fragment instanceof WheelyMapFragment)) {
+            fragment = new WheelyMapFragment();
+            fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, TAG_FRAGMENT).commit();
+        }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
 
     private void hideDialog() {
         try {
@@ -104,12 +118,6 @@ public class WheelyTestActivity extends ActionBarActivity {
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(receiver);
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {
