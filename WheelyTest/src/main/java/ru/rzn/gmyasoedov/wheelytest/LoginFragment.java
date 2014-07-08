@@ -6,12 +6,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Login fragment
@@ -56,11 +53,6 @@ public class LoginFragment extends Fragment {
                     Intent connectIntent = new Intent(getActivity(), WheelyService.class);
                     connectIntent.putExtra(NAME, name.getText().toString());
                     connectIntent.putExtra(PASSWORD, password.getText().toString());
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(3000);
-                    } catch (InterruptedException e) {
-                        Log.e("e", e.getMessage());
-                    }
                     BroadcastUtils.sendBroadcast(BroadcastUtils.STATUS_CONNECTION_START, null, getActivity());
                     getActivity().startService(connectIntent);
                 } else {

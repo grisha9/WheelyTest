@@ -3,7 +3,6 @@ package ru.rzn.gmyasoedov.wheelytest;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -22,7 +21,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Map fragment
@@ -60,27 +58,15 @@ public class WheelyMapFragment extends Fragment {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.map_container, mapFragment);
         fragmentTransaction.commit();
-        //show pin if its exist. need deelay for map rendering
-        new AsyncTask<Void, Void, Void>() {
+        view.post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(MAP_TIMEOUT);
-                } catch (InterruptedException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
+            public void run() {
                 if (mapFragment.getMap() != null) {
                     mapFragment.getMap().setMyLocationEnabled(true);
                     addMarkers(optionses, mapFragment.getMap());
                 }
             }
-        }.execute();
+        });
         return view;
     }
 
